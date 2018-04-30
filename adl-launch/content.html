@@ -1,0 +1,76 @@
+<html>
+
+<head>
+</head>
+
+<body>
+  <header>
+    Old School Content
+  </header>
+  <script>
+    const initialiseLaunch = async (launchServerEndpoint, launchServerToken) => {
+      const response = await fetch(`${launchServerEndpoint}/launch/${launchServerToken}`, {
+        method: 'POST',
+        mode: 'cors',
+      });
+      return await response.json();
+    };
+
+    const terminateLaunch = async (launchServerEndpoint, launchServerToken) => {
+      await fetch(`${launchServerEndpoint}/launch/${launchServerToken}/terminate`, {
+        method: 'POST',
+        mode: 'cors',
+      });
+    };
+
+    const sendStatement = async (xapiEndpoint, launchServerToken, xapiStatement) => {
+      await fetch(`${xapiEndpoint}/${launchServerToken}/xAPI/statements`, {
+        body: JSON.stringify(statement),
+        headers: {
+          'authorization': auth,
+          'content-type': 'application/json',
+          'x-experience-api-version': '1.0.0',
+        },
+        method: 'POST',
+        mode: 'cors',
+      });
+    };
+
+    const main = async () => {
+      try {
+        const urlParams = new URLSearchParams(document.location.search);
+        const launchServerEndpoint = urlParams.get('xAPILaunchService');
+        const launchServerToken = urlParams.get('xAPILaunchKey');
+        const launch = await initialiseLaunch(launchServerEndpoint, launchServerToken);
+        const xapiStatement = {
+          actor: JSON.parse(actor),
+          verb: {
+            id: 'http://activitystrea.ms/schema/1.0/access',
+            display: {
+              'en': 'accessed'
+            }
+          },
+          object: {
+            objectType: 'Activity',
+            id: 'http://www.example.org/activity',
+            definition: {
+              type: 'http://activitystrea.ms/schema/1.0/page',
+              name: {
+                'en': 'Example Activity'
+              }
+            }
+          }
+        };
+        await sendStatement(launch.endpoint, launchServerToken, xapiStatement);
+        alert('Sent statement');
+      } catch (err) {
+        alert('Failed sending statement');
+      }
+      await terminateLaunch(launchServerEndpoint, launchServerToken);
+    };
+
+    main();
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,60 @@
+<html>
+
+<head>
+</head>
+
+<body>
+  <header>
+    Old School Content
+  </header>
+  <script>
+    const sendStatement = async (xapiEndpoint, xapiAuth, xapiStatement) => {
+      await fetch(`${xapiEndpoint}/statements`, {
+        body: JSON.stringify(xapiStatement),
+        headers: {
+          'authorization': xapiAuth,
+          'content-type': 'application/json',
+          'x-experience-api-version': '1.0.0',
+        },
+        method: 'POST',
+        mode: 'cors',
+      });
+    };
+
+    const main = async () => {
+      try {
+        const urlParams = new URLSearchParams(document.location.search);
+        const xapiEndpoint = urlParams.get('endpoint');
+        const xapiAuth = urlParams.get('auth');
+        const xapiActor = urlParams.get('actor');
+        const xapiStatement = {
+          actor: JSON.parse(xapiActor),
+          verb: {
+            id: 'http://activitystrea.ms/schema/1.0/access',
+            display: {
+              'en': 'accessed'
+            }
+          },
+          object: {
+            objectType: 'Activity',
+            id: 'http://www.example.org/activity',
+            definition: {
+              type: 'http://activitystrea.ms/schema/1.0/page',
+              name: {
+                'en': 'Example Activity'
+              }
+            }
+          }
+        };
+        await sendStatement(xapiEndpoint, xapiAuth, xapiStatement);
+        alert('Sent statement');
+      } catch (err) {
+        alert('Failed sending statement');
+      }
+    };
+
+    main();
+  </script>
+</body>
+
+</html>
