@@ -1,8 +1,9 @@
 const express = require('express');
+const fetch = require('node-fetch');
 const fs = require('fs');
 const http = require('http');
 
-const createLaunchOnLaunchServer = (launchServerEndpoint, launchServerAuth, sessionId, xapiActor) => {
+const createLaunchOnLaunchServer = async (launchServerEndpoint, launchServerAuth, sessionId, xapiActor) => {
   const response = await fetch(`${launchServerEndpoint}/session/${sessionId}/launch`, {
     body: JSON.stringify({
       statement: {
@@ -41,7 +42,11 @@ expressApp.get('/launch-content', async (request, response) => {
     name: 'Example Actor',
   };
   const launchServerToken = await createLaunchOnLaunchServer(launchServerEndpoint, launchServerAuth, sessionId, xapiActor);
-  res.redirect(`content.html?xAPILaunchKey=${launchServerToken}&xAPILaunchService=${launchServerEndpoint}`);
+  response.redirect(`content.html?xAPILaunchKey=${launchServerToken}&xAPILaunchService=${launchServerEndpoint}`);
+});
+
+expressApp.use('/', (request, response) => {
+  response.sendStatus(404);
 });
 
 const server = http.createServer(expressApp);
