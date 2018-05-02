@@ -41,8 +41,10 @@
       const launchServerToken = urlParams.get('xAPILaunchKey');
       try {
         const launch = await initialiseLaunch(launchServerEndpoint, launchServerToken);
+        const launchActor = launch.actor;
+        const launchEndpoint = launch.endpoint;
         const xapiStatement = {
-          actor: launch.actor,
+          actor: launchActor,
           verb: {
             id: 'http://activitystrea.ms/schema/1.0/access',
             display: {
@@ -60,7 +62,7 @@
             }
           }
         };
-        await sendStatement(launch.endpoint, xapiStatement);
+        await sendStatement(launchEndpoint, xapiStatement);
         alert('Sent statement');
       } catch (err) {
         console.error(err);
