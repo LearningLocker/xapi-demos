@@ -44,10 +44,15 @@ expressApp.get('/launch-content', async (request, response) => {
     mbox: 'mailto:test@example.org',
     name: 'Example Actor',
   };
-  const launchServerToken = await createLaunchOnLaunchServer(launchServerEndpoint, launchServerAuth, sessionId, xapiActor);
-  const tokenUrlParam = `xAPILaunchKey=${launchServerToken}`;
+  const launchServerKey = await createLaunchOnLaunchServer(
+    launchServerEndpoint,
+    launchServerAuth,
+    sessionId,
+    xapiActor
+  );
+  const keyUrlParam = `xAPILaunchKey=${launchServerKey}`;
   const endpointUrlParam = `xAPILaunchService=${encodeURIComponent(contentLaunchServerEndpoint)}`;
-  response.redirect(`content?${tokenUrlParam}&${endpointUrlParam}`);
+  response.redirect(`content?${keyUrlParam}&${endpointUrlParam}`);
 });
 
 expressApp.use('/', (request, response) => {

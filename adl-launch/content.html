@@ -8,16 +8,16 @@
     Example ADL Launch Content
   </header>
   <script>
-    const initialiseLaunch = async (launchServerEndpoint, launchServerToken) => {
-      const response = await fetch(`${launchServerEndpoint}/launch/${launchServerToken}`, {
+    const initialiseLaunch = async (launchServerEndpoint, launchServerKey) => {
+      const response = await fetch(`${launchServerEndpoint}/launch/${launchServerKey}`, {
         method: 'POST',
         mode: 'cors',
       });
       return await response.json();
     };
 
-    const terminateLaunch = async (launchServerEndpoint, launchServerToken) => {
-      await fetch(`${launchServerEndpoint}/launch/${launchServerToken}/terminate`, {
+    const terminateLaunch = async (launchServerEndpoint, launchServerKey) => {
+      await fetch(`${launchServerEndpoint}/launch/${launchServerKey}/terminate`, {
         method: 'POST',
         mode: 'cors',
       });
@@ -38,9 +38,9 @@
     const main = async () => {
       const urlParams = new URLSearchParams(document.location.search);
       const launchServerEndpoint = urlParams.get('xAPILaunchService');
-      const launchServerToken = urlParams.get('xAPILaunchKey');
+      const launchServerKey = urlParams.get('xAPILaunchKey');
       try {
-        const launch = await initialiseLaunch(launchServerEndpoint, launchServerToken);
+        const launch = await initialiseLaunch(launchServerEndpoint, launchServerKey);
         const launchActor = launch.actor;
         const launchEndpoint = launch.endpoint;
         const xapiStatement = {
@@ -68,7 +68,7 @@
         console.error(err);
         alert('Failed sending statement');
       }
-      await terminateLaunch(launchServerEndpoint, launchServerToken);
+      await terminateLaunch(launchServerEndpoint, launchServerKey);
     };
 
     main();
