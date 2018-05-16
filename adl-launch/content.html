@@ -9,7 +9,7 @@
   </header>
   <script>
     const initialiseLaunch = async (launchServerEndpoint, launchServerKey) => {
-      const response = await fetch(`${launchServerEndpoint}/launch/${launchServerKey}`, {
+      const response = await fetch(`${launchServerEndpoint}launch/${launchServerKey}`, {
         method: 'POST',
         mode: 'cors',
       });
@@ -17,7 +17,7 @@
     };
 
     const terminateLaunch = async (launchServerEndpoint, launchServerKey) => {
-      await fetch(`${launchServerEndpoint}/launch/${launchServerKey}/terminate`, {
+      await fetch(`${launchServerEndpoint}launch/${launchServerKey}/terminate`, {
         method: 'POST',
         mode: 'cors',
       });

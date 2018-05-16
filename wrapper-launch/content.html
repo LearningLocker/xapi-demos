@@ -1,0 +1,74 @@
+<html>
+
+<head>
+  <script type="text/javascript" src="./lib/cryptojs_v3.1.2.js"></script>
+  <script type="text/javascript" src="./lib/xapiwrapper.min.js"></script>
+</head>
+
+<body>
+  <header>
+    Example ADL Launch Content
+  </header>
+  <script>
+    const initialiseLaunch = async () => {
+      return new Promise((resolve, reject) => {
+        ADL.launch((err, launchData, xapiWrapper) => {
+          if (err !== undefined && err !== null) {
+            reject(err);
+            return;
+          }
+          resolve({ launchData, xapiWrapper });
+          return;
+        });
+      });
+    };
+
+    const sendStatement = async (xapiWrapper, xapiStatement) => {
+      return new Promise((resolve, reject) => {
+        xapiWrapper.sendStatement(xapiStatement, (response, body) => {
+          if (response.status !== 200) {
+            reject(response.responseText);
+            return;
+          }
+          resolve();
+        });
+      });
+    };
+
+    const main = async () => {
+      try {
+        const launch = await initialiseLaunch();
+        const launchActor = launch.launchData.actor;
+        const xapiWrapper = launch.xapiWrapper
+        const xapiStatement = {
+          actor: launchActor,
+          verb: {
+            id: 'http://activitystrea.ms/schema/1.0/access',
+            display: {
+              'en': 'accessed'
+            }
+          },
+          object: {
+            objectType: 'Activity',
+            id: 'http://www.example.org/activity',
+            definition: {
+              type: 'http://activitystrea.ms/schema/1.0/page',
+              name: {
+                'en': 'Example Activity'
+              }
+            }
+          }
+        };
+        await sendStatement(xapiWrapper, xapiStatement);
+        alert('Sent statement');
+      } catch (err) {
+        console.error(err);
+        alert('Failed sending statement');
+      }
+    };
+
+    main();
+  </script>
+</body>
+
+</html>

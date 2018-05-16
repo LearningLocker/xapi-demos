@@ -34,6 +34,11 @@ expressApp.get('/content', (request, response) => {
   fs.createReadStream(path.join(__dirname, 'content.html')).pipe(response);
 });
 
+expressApp.get('/lib/:path', (request, response) => {
+  response.setHeader('content-type', 'text/html');
+  fs.createReadStream(path.join(__dirname, 'lib', request.params.path)).pipe(response);
+});
+
 expressApp.get('/launch-content', async (request, response) => {
   const launchServerEndpoint = 'http://my.launchserver';
   const launchServerAuth = 'Basic NTlkZGQzYmY4YTA5ZDAzMzU5OTBiOWZhOjVhZTcyZDA3MjQ4ODdhNWM2MTY4MzEwYQ==';
