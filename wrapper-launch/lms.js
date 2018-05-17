@@ -35,7 +35,7 @@ expressApp.get('/content', (request, response) => {
 });
 
 expressApp.get('/lib/:path', (request, response) => {
-  response.setHeader('content-type', 'text/html');
+  response.setHeader('content-type', 'application/javascript');
   fs.createReadStream(path.join(__dirname, 'lib', request.params.path)).pipe(response);
 });
 
