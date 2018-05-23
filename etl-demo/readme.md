@@ -9,3 +9,6 @@
 1. Install the dependencies `npm install`.
 1. Change the `xapiEndpoint` and `xapiAuth` details in the [loadStatements.js file](/loadStatements.js).
 1. Run the ETL process `node etl-demo/etl.js`.
+
+## Real World Examples
+- [Moodle xAPI Logstore Plugin](https://github.com/xAPI-vle/moodle-logstore_xapi)

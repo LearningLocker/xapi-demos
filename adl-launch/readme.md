@@ -10,3 +10,6 @@
 1. Change the `launchServerEndpoint` and `launchServerAuth` details in the [lms.js file](/lms.js).
 1. Start the LMS server `node adl-launch/lms.js`.
 1. Navigate to the LMS `http://localhost:1337/lms`.
+
+## Real World Examples
+- [Kineo's Adapt xAPI Plugin](https://github.com/cgkineo/adapt-xAPI)
