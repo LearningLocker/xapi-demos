@@ -1,0 +1,125 @@
+<html>
+
+<head>
+</head>
+
+<body>
+  <header>
+    Attachment Example Response
+  </header>
+  <pre id="response"></pre>
+  <script>
+    const xapiEndpoint = 'https://saas.learninglocker.net/data/xAPI';
+    const xapiAuth = 'Basic MTE1ODg5ZDgyNzQyZjE3YTdhZDU0OGNiODM4YzdkOGEzNDQwYjRlODo1ZmU5MGNjMWM0ZTVjNTZjNzA3ZTAwYTVhMGE3MGQwMDczMDUwMTNm';
+
+    // https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest
+    async function digestMessage(message) {
+      const msgUint8 = new TextEncoder().encode(message);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+      return hashHex;
+    }
+
+    async function uploadStatementWithAttachment(xapiEndpoint, xapiAuth) {
+      const attachmentContent = 'demo';
+      const attachmentHash = await digestMessage(attachmentContent);
+
+      const xapiStatement = {
+        actor: {
+          mbox: 'mailto:attachment-demo@example.org'
+        },
+        verb: {
+          id: 'http://activitystrea.ms/schema/1.0/access',
+          display: {
+            'en': 'accessed'
+          }
+        },
+        object: {
+          objectType: 'Activity',
+          id: 'http://www.example.org/activity',
+          definition: {
+            type: 'http://activitystrea.ms/schema/1.0/page',
+            name: {
+              'en': 'Example Activity'
+            }
+          }
+        },
+        attachments: [
+          {
+            usageType: 'http://id.tincanapi.com/attachment/certificate-of-completion',
+            display: { en: 'A demo attachment' },
+            contentType: 'text/plain; charset=ascii',
+            length: attachmentContent.length,
+            sha2: attachmentHash
+          }
+        ]
+      };
+
+      const boundary = 'abc'
+      const statementPartHeaders = 'Content-Type:application/json';
+      const statementPartBody = JSON.stringify(xapiStatement);
+      const statementPart = `${statementPartHeaders}\n\n${statementPartBody}`;
+      const attachmentPartHeaders = [
+        'Content-Type:text/plain',
+        'Content-Transfer-Encoding:binary',
+        `X-Experience-API-Hash:${attachmentHash}`
+      ].join('\n');
+      const attachmentPartBody = attachmentContent;
+      const attachmentPart = `${attachmentPartHeaders}\n\n${attachmentPartBody}`
+      const requestBody = [
+        `--${boundary}`,
+        statementPart,
+        `--${boundary}`,
+        attachmentPart,
+        `--${boundary}--`
+      ].join('\n');
+
+      const response = await fetch(`${xapiEndpoint}/statements`, {
+        body: requestBody,
+        headers: {
+          'authorization': xapiAuth,
+          'content-type': `multipart/mixed; boundary="${boundary}"`,
+          'x-experience-api-version': '1.0.0',
+        },
+        method: 'POST',
+        mode: 'cors',
+      });
+
+      if (response.status !== 200) {
+        throw new Error('Unexpected response from LRS');
+      }
+
+      const responseBody = await response.json();
+      const statementId = responseBody[0];
+      return statementId;
+    }
+
+    async function downloadStatementWithAttachment(xapiEndpoint, xapiAuth, statementId) {
+      const response = await fetch(`${xapiEndpoint}/statements?statementId=${statementId}&attachments=true`, {
+        headers: {
+          'authorization': xapiAuth,
+          'x-experience-api-version': '1.0.0',
+        },
+        method: 'GET',
+        mode: 'cors',
+      });
+
+      if (response.status !== 200) {
+        throw new Error('Unexpected response from LRS');
+      }
+
+      return await response.text();
+    }
+
+    async function main() {
+      const statementId = await uploadStatementWithAttachment(xapiEndpoint, xapiAuth);
+      const response = await downloadStatementWithAttachment(xapiEndpoint, xapiAuth, statementId);
+      document.getElementById('response').innerText = response;
+    }
+
+    main();
+  </script>
+</body>
+
+</html>
